@@ -25,4 +25,4 @@ class RegisterForm(FlaskForm):
                              validators=[validators.DataRequired(message="Password is required"),
                                          validators.Length(min=6, message="Min 6 length of password is required")]
                              )
-    submit = SubmitField("Log In")
+    submit = SubmitField("Register")

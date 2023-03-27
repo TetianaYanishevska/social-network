@@ -1,9 +1,9 @@
-from app import app
+from app.main import bp
 from flask import render_template
 
 
-@app.route("/")
-@app.route("/index")
+@bp.route("/")
+@bp.route("/index")
 def index():
     context = {
         "user": {"username": "Tetiana"},
@@ -12,7 +12,7 @@ def index():
     return render_template("index.html", **context)
 
 
-@app.route("/about")
+@bp.route("/about")
 def about():
     context = {
         "page": "About",
