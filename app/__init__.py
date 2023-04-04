@@ -23,7 +23,7 @@ def create_app():
     from .fake_data import bp as fake_bp
     app.register_blueprint(fake_bp)
 
-    from . import models
+    from . import models # noqa
 
     @app.context_processor
     def context_processor():
