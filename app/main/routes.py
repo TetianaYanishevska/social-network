@@ -65,5 +65,3 @@ def about():
         "title": "Hillel"
     }
     return render_template("about.html", **context)
-    
-

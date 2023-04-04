@@ -19,4 +19,3 @@ def register():
         flash(f"Registered Username={form.data['username']}, Email={form.data['email']}", category="success")
         return redirect(url_for("main.index"))
     return render_template("auth/register.html", form=form)
-
