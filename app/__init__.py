@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask import Flask
 from config import Config
 from flask_login import current_user
@@ -16,14 +18,24 @@ def create_app():
     app.config.from_object(Config)
     db.init_app(app)
     migrate.init_app(app, db)
+    login_manager.init_app(app)
+    login_manager.login_view = "auth.login"
     from .main import bp as main_bp
     app.register_blueprint(main_bp)
     from .auth import bp as auth_bp
     app.register_blueprint(auth_bp)
     from .fake_data import bp as fake_bp
     app.register_blueprint(fake_bp)
+    from .user import bp as user_bp
+    app.register_blueprint(user_bp)
+    from .post import bp as post_bp
+    app.register_blueprint(post_bp)
 
     from . import models # noqa
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        return models.User.query.get(user_id)
 
     @app.context_processor
     def context_processor():
@@ -34,3 +46,11 @@ def create_app():
 
 
 app = create_app()
+
+
+@app.before_request
+def before_request():
+    if current_user.is_authenticated:
+        if current_user.profile:
+            current_user.profile.last_seen = datetime.utcnow()
+            db.session.commit()
