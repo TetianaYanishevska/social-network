@@ -1,42 +1,105 @@
 {% extends 'base.html' %}
 
 {% block content %}
+    <div class="container">
+        <h1 class="mb-4">Profile</h1>
+        <div class="row">
+            <div class="col-md-4">
+                <img src="{{ user.avatar(128) }}" class="img-thumbnail mb-3" alt="">
+                <div>
+                    <h5>{{ user.username }}</h5>
+                    <p class="text-muted">{{ user.email }}</p>
+                </div>
+                 <p class="small">Last seen: {{ user.profile.last_seen.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                {% if user!=current_user %}
+                    {% if user.is_following() %}
+                        <form action="{{ url_for('user.unfollow', user_id = user.id)}}" method="post">
+                            <button type="submit">Unfollow</button>
+                        </form>
+                    {% else  %}
+                        <form action="{{ url_for('user.follow', user_id = user.id)}}" method="post">
+                            <button type="submit">Follow</button>
+                        </form>
+                    {% endif %}
+                {% endif %}
+            </div>
+            <div class="col-md-8">
+                {% if user == current_user %}
+                <form method="post" action="{{ url_for('user.profile', username=user.username) }}">
+                    {{ form.csrf_token }}
+                    <div class="form-group row">
+                        <label for="inputFirstName" class="col-sm-2 col-form-label">First Name</label>
+                        <div class="col-sm-10">
+                            {{ form.first_name(class="form-control", id="inputFirstName") }}
+                            {% for error in form.first_name.errors %}
+                                <div class="alert alert-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="inputLastName" class="col-sm-2 col-form-label">Last Name</label>
+                        <div class="col-sm-10">
+                            {{ form.last_name(class="form-control", id="inputLastName") }}
+                            {% for error in form.last_name.errors %}
+                                <div class="alert alert-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="inputFacebook" class="col-sm-2 col-form-label">Facebook</label>
+                        <div class="col-sm-10">
+                            {{ form.facebook(class="form-control", id="inputFacebook") }}
+                            {% for error in form.facebook.errors %}
+                                <div class="alert alert-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="inputLinkedin" class="col-sm-2 col-form-label">LinkedIn</label>
+                        <div class="col-sm-10">
+                            {{ form.linkedin(class="form-control", id="inputLinkedin") }}
+                            {% for error in form.linkedin.errors %}
+                                <div class="alert alert-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="inputAboutme" class="col-sm-2 col-form-label">About Me</label>
+                        <div class="col-sm-10">
+                            {{ form.about_me(class="form-control", id="inputAboutme") }}
+                            {% for error in form.about_me.errors %}
+                                <div class="alert alert-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </form>
+                {% endif %}
+            </div>
 
-<table>
-        <tr valign="top">
-            <td><img src="{{ user.avatar(128) }}"></td>
-            <td><h1>User: {{ user.username }}</h1>
-            <h2>Email: {{ user.email }}</h2>
-            <h3>Created at: {{ user.created_at }}</h3></td>
-        </tr>
-    </table>
+            <div class="col-md-4">
+                {% if user == current_user %}
+                <body>
+                    <h7>You are following:</h7>
+                    <ul>
+                    {% for f in user.followees() %}
+                        <li>
+                            <a href="{{ url_for('user.profile', username=f) }}" class="btn btn-primary">{{ f }}</a>
+                        </li>
+                    {% endfor %}
+                    </ul>
+                    <h7>Your followers:</h7>
+                    <ul>
+                    {% for f in user.followers() %}
+                        <li>
+                            <a href="{{ url_for('user.profile', username=f) }}" class="btn btn-primary">{{ f }}</a>
+                        </li>
+                    {% endfor %}
+                    </ul>
+                </body>
+                {% endif %}
+            </div>
 
-<div class="container">
-    <form method="POST" action="">
-        {{ form.hidden_tag() }}
-        <div class="form-group">
-            {{ form.first_name.label(class="form-label")}}
-            {{ form.first_name(class="form-control", size=32) }}
         </div>
-        <div class="form-group">
-            {{ form.last_name.label(class="form-label")}}
-            {{ form.last_name(class="form-control", size=32) }}
-        </div>
-        <div class="form-group">
-            {{ form.linkedin.label(class="form-label")}}
-            {{ form.linkedin(class="form-control", size=32) }}
-        </div>
-        <div class="form-group">
-            {{ form.facebook.label(class="form-label")}}
-            {{ form.facebook(class="form-control", size=32) }}
-        </div>
-        <div class="form-group">
-            {{ form.about_me.label(class="form-label")}}
-            {{ form.about_me(class="form-control") }}
-        </div>
-        <div class="form-group">
-            {{ form.save(class="btn btn-primary")}}
-        </div>
-    </form>
-</div>
+    </div>
 {% endblock %}
