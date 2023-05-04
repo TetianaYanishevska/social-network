@@ -21,3 +21,11 @@ alembic==1.10.2
 faker==18.3.2
 flake8==6.0.0
 psycopg2-binary==2.9.6
+aniso8601==9.0.1
+flask-restful==0.3.9
+pytz==2023.3
+marshmallow==3.19.0
+marshmallow-sqlalchemy==0.29.0
+packaging==23.1
+PyJWT==2.6.0
+flask-jwt-extended==4.4.4
