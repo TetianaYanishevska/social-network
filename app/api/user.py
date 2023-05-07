@@ -35,6 +35,7 @@ class UserResource(Resource):
         user = user_service.update(json_data)
         return jsonify(UserSchema(exclude=("password",)).dump(user, many=False))
 
+    @jwt_required()
     def delete(self, user_id):
         status = user_service.delete(user_id)
         return jsonify(status=status)
