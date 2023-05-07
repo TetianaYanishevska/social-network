@@ -1,6 +1,8 @@
 from app import db
-from app.models import User, Profile
-from app.schemas import UserSchema
+from app.models import User, Profile, Post
+from app.schemas import UserSchema, PostSchema
+from flask_login import current_user
+from flask import jsonify
 
 
 class UserService:
@@ -37,5 +39,40 @@ class UserService:
         db.session.delete(profile)
         db.session.commit()
         db.session.delete(user)
+        db.session.commit()
+        return True
+
+
+class PostService:
+    def get_by_author(self, author_id):
+        query = db.session.query(Post)
+        if author_id:
+            query = query.filter(Post.author_id == author_id)
+        posts = query.all()
+        return posts
+
+    def get_by_id(self, post_id):
+        post = db.session.query(Post).filter(Post.id == post_id).first_or_404()
+        return post
+
+    def create(self, **kwargs):
+        if kwargs.get('author_id') != current_user.id:
+            response = jsonify(error="Post author not match")
+            response.status_code = 400
+            return response
+        new_post = Post(author_id=kwargs.get('author_id'), title=kwargs.get('title'), content=kwargs.get('content'))
+        db.session.add(new_post)
+        db.session.commit()
+        return new_post
+
+    def update(self, data):
+        updated_post = PostSchema().load(data)
+        db.session.add(updated_post)
+        db.session.commit()
+        return updated_post
+
+    def delete(self, post_id):
+        post = self.get_by_id(post_id)
+        db.session.delete(post)
         db.session.commit()
         return True

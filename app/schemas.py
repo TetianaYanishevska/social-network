@@ -1,7 +1,7 @@
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchemaOpts, SQLAlchemyAutoSchema
 from marshmallow import EXCLUDE
 from app import db
-from app.models import User, Profile, Post, Like
+from app.models import User, Profile, Post, Like, Dislike
 from marshmallow.fields import Nested
 
 
@@ -42,3 +42,8 @@ class PostSchema(BaseSchema):
 class LikeSchema(BaseSchema):
     class Meta:
         model = Like
+
+
+class DislikeSchema(BaseSchema):
+    class Meta:
+        model = Dislike
