@@ -1,6 +1,6 @@
 from app import db
-from app.models import User, Profile, Post
-from app.schemas import UserSchema, PostSchema
+from app.models import User, Profile, Post, Like, Dislike
+from app.schemas import UserSchema, PostSchema, ProfileSchema
 from flask_login import current_user
 from flask import jsonify
 
@@ -76,3 +76,51 @@ class PostService:
         db.session.delete(post)
         db.session.commit()
         return True
+
+
+class ProfileService(UserService):
+    def get(self, user_id):
+        user = super().get_by_id(user_id)
+        profile = user.profile
+        return profile
+
+    def update(self, data):
+        user = super().get_by_id(data['user_id'])
+        data['id'] = user.profile.id
+        data['user_id'] = user.id
+        profile = ProfileSchema().load(data)
+        db.session.add(profile)
+        db.session.commit()
+        return profile
+
+
+class LikeService:
+    def create(self, **kwargs):
+        post_id = kwargs.get('post_id')
+        user_id = kwargs.get('user_id')
+        like = (db.session.query(Like)
+                .filter(Like.post_id == post_id,
+                        Like.user_id == user_id)
+                ).first()
+        if like:
+            return False
+        new_like = Like(user_id=user_id, post_id=post_id)
+        db.session.add(new_like)
+        db.session.commit()
+        return new_like
+
+
+class DislikeService:
+    def create(self, **kwargs):
+        post_id = kwargs.get('post_id')
+        user_id = kwargs.get('user_id')
+        dislike = (db.session.query(Dislike)
+                   .filter(Dislike.post_id == post_id,
+                           Dislike.user_id == user_id)
+                   ).first()
+        if dislike:
+            return False
+        new_dislike = Dislike(user_id=user_id, post_id=post_id)
+        db.session.add(new_dislike)
+        db.session.commit()
+        return new_dislike
