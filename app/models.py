@@ -4,6 +4,7 @@ from hashlib import md5
 from app import db
 from flask_login import UserMixin, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy.ext.hybrid import hybrid_property
 
 
 class BaseModel(db.Model):
@@ -19,7 +20,7 @@ class User(BaseModel, UserMixin):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     posts = db.relationship(
-        "Post", backref="author", uselist=True, lazy="dynamic", cascade="all,delete"
+        "Post", backref="author", uselist=True, lazy="joined", cascade="all,delete"
     )
     likes = db.relationship(
         'Like', backref='user', lazy='dynamic', primaryjoin='User.id==Like.user_id', cascade="all,delete"
@@ -93,6 +94,10 @@ class Profile(BaseModel):
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
 
     user = db.relationship("User", backref=db.backref("profile", uselist=False), uselist=False)
+
+    @hybrid_property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
 
 
 class Post(BaseModel):
